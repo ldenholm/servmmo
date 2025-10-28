@@ -29,5 +29,15 @@ int main()
         std::cout << "Error establishing connection.\n" << ec.message() << std::endl;
     }
 
+    if (socket.is_open())
+    {
+        std::string req =
+            "GET /index.html HTTP/1.1\r\n"
+            "HOST: darkswordminiatures.com\r\n"
+            "Connection: close\r\n\r\n";
+
+        socket.write_some(asio::buffer(req.data(), req.size()), ec);
+    }
+
     return 0;
 }
