@@ -5,24 +5,37 @@
 #define ASIO_STANDALONE
 #include <iostream>
 #include <asio.hpp>
+#include <functional>
 
-void print(const std::error_code& e)
+void print(const std::error_code& e,
+    asio::steady_timer* t, int* count)
 {
+    if (*count < 5)
+    {
+        std::cout << *count << std::endl;
+        (*count)++;
+        t->expires_at(t->expiry() + asio::chrono::seconds(1));
+        t->async_wait(std::bind(print,
+            asio::placeholders::error, t, count));
+        std::cout << "this is quick" << std::endl;
+    }
     std::cout << "Guten Tag, Welt!" << std::endl;
 }
 
 int main()
 {
-
-    asio::error_code ec;
     asio::io_context context;
-    asio::steady_timer timer(context, asio::chrono::seconds(5));
+    int count = 0;
+    asio::steady_timer timer(context, asio::chrono::seconds(1));
     
     // Blocking wait.
     //timer.wait();
     //std::cout << "Guten Tag, Welt!" << std::endl;
 
-    timer.async_wait(&print);
+    timer.async_wait(std::bind(print,
+        asio::placeholders::error, &timer, &count));
     context.run();
+    
+    std::cout << "Final count is: " << count << std::endl;
     return 0;
 }
