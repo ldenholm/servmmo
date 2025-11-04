@@ -24,6 +24,7 @@
     <ProjectGuid>{a3645ed3-c9f0-4f0f-864e-a409e535b238}</ProjectGuid>
     <RootNamespace>servmmo</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ServMMO</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
