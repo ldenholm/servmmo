@@ -23,7 +23,7 @@ namespace smmo
 
 			size_t size() const
 			{
-				return sizeof(header_message<T> + body.size());
+				return sizeof(message_header<T>) + body.size();
 			}
 
 			// Overwrite << operator to easily inspect packets.
@@ -51,10 +51,10 @@ namespace smmo
 				size_t i = msg.body.size();
 
 				// Resize the body to allow additional space to store new data.
-				msg.body.resize(i + sizeof(Datatype));
+				msg.body.resize(i + sizeof(DataType));
 
 				// Push (copy) the new data into our message body.
-				std::memcpy(msg.body.data() + i, &data, sizeof(DataType);
+				std::memcpy(msg.body.data() + i, &data, sizeof(DataType));
 
 				// Recompute the message size.
 				msg.header.size = msg.size();
@@ -68,10 +68,10 @@ namespace smmo
 				Usage: msg >> x >> y (pulling data out).
 			*/
 			template<typename DataType>
-			friend message<T> operator >> (message<T>& msg, DataType& data)
+			friend message<T>& operator >> (message<T>& msg, DataType& data)
 			{
 				// Check data can easily be extracted.
-				static_assert(std::is_standard_layout < DataType::value, "Data cannot easily \
+				static_assert(std::is_standard_layout <DataType>::value, "Data cannot easily \
 					be extraced.");
 
 				size_t bytes = msg.body.size() - sizeof(DataType);
@@ -84,7 +84,7 @@ namespace smmo
 				
 				*/
 
-				std::memcpy(&data, msg.body.data() + bytes, sizeof(DataType);
+				std::memcpy(&data, msg.body.data() + bytes, sizeof(DataType));
 
 				// Resize the message body.
 				msg.body.resize(bytes);
