@@ -38,7 +38,6 @@ namespace smmo
 						 Let msg be our message<T>.
 
 				Usage: msg << x << y (pushing data in).
-					   msg >> x >> y (pulling data out).
 			*/
 			template<typename DataType>
 			friend message<T>& operator << (message<T>& msg, const DataType& data)
@@ -94,6 +93,27 @@ namespace smmo
 
 				return msg;
 
+			}
+		};
+
+		// We just need the incomplete type here for the remote shared_ptr
+		// hence the forward declaration.
+		template<typename T>
+		class connection;
+
+		// Extended message struct for server to know which
+		// client owns the incoming message.
+		template <typename T>
+		struct owned_message
+		{
+			std::shared_ptr<connection<T>> remote = nullptr;
+			message<T> msg;
+
+			// Easily output message string.
+			friend std::ostream& operator <<(std::ostream& os, const owned_message<T>& msg)
+			{
+				os << msg.msg;
+				return os;
 			}
 		};
 	}
