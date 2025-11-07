@@ -21,7 +21,7 @@ namespace smmo
 		public:
 			bool ConnectToServer();
 			bool Disconnect();
-			bool isConnected() const;
+			bool IsConnected() const;
 
 		public:
 			bool Send(const message<T>& msg);
