@@ -1,3 +1,3 @@
-#Initial Collisions
+## Initial Collisions
 
-[Init_Collision](servmmo\Balls\Init_Collision.gif)
+[Init_Collision](Balls/Init_Collision.gif)
