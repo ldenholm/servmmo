@@ -89,12 +89,13 @@ public:
 
 						float fOverlap = fDistance - ball.radius - target.radius;
 						
-						// We only need d/2 and it has negative sign so we can use it to displace the balls.
+						// We only need d/2 so we can use it to displace the balls.
 						fOverlap *= 0.5f;
 
 						// Displace ball.
 						// This is simply u = v/||v||, to get a unit vector in the direction of our displacement
-						// then simply scaling it by fOverlap.
+						// then simply scaling it by fOverlap. Note also ball moves away from the collision, and
+						// the converse is true for the target.
 						ball.px -= fOverlap * ((ball.px - target.px) / fDistance);
 						ball.py -= fOverlap * ((ball.py - target.py) / fDistance);
 
@@ -121,6 +122,21 @@ public:
 					break;
 				}
 			}
+		}
+
+		if (GetMouse(0).bHeld)
+		{
+			if (pSelectedBall != nullptr)
+			{
+				pSelectedBall->px = GetMouseX();
+				pSelectedBall->py = GetMouseY();
+			}
+		}
+
+		// Deselect ball on mouse release.
+		if (GetMouse(0).bReleased)
+		{
+			pSelectedBall = nullptr;
 		}
 		
 		Clear(olc::BLACK);
