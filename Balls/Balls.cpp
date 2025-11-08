@@ -100,6 +100,9 @@ public:
 				if (IsCircleSelected(ball.px, GetMouseX(), ball.py, GetMouseY(), ball.radius))
 				{
 					pSelectedBall = &ball;
+#ifdef _DEBUG
+					cout << "Seleced ball: " << pSelectedBall->id;
+#endif
 					break;
 				}
 			}
