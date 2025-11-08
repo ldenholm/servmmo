@@ -50,6 +50,13 @@ public:
 				return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) <= (r1 + r2) * (r1 + r2));
 
 			};
+
+
+		// Helper function to determine if a point exists within a circle (ie cardinality within a set of points).
+		auto IsCircleSelected = [](float x1, float x2, float y1, float y2, float radius)
+			{
+				return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) < (radius * radius));
+			};
 		
 		// Collision detection (quadratic, replace with uniform grid).
 		for (auto& ball : vecBalls)
@@ -58,15 +65,44 @@ public:
 			{
 				if (ball.id != target.id)
 				{
+					if (DoCirclesOverlap(ball.px, ball.py, ball.radius, 
+						target.px, target.py, target.radius))
+					{
+						// Collision detected, resolve by translating balls d/2 in opposite direction
+						// of the collision, where d is the magnitude of the displacement vector.
+						// Note that (r1 + r2) - sqrt(a^2+b^2) yields the magnitude of the displacement vector.
+						
+						// Distance between ball centers:
+						float fDistance = sqrtf((target.px - ball.px) * (target.px - ball.px) + (target.py - ball.py) * (target.py - ball.py));
+						// We only need d/2 and it has negative sign so we can use it to displace the balls.
+						float fOverlap = 0.5f * (fDistance - ball.radius - target.radius);
 
+						// Displace ball.
+						// This is simply u = v/||v||, to get a unit vector in the direction of our displacement
+						// then simply scaling it by fOverlap.
+						ball.px -= fOverlap * ((ball.px - target.px) / fDistance);
+						ball.py -= fOverlap * ((ball.py - target.py) / fDistance);
+
+						// Displace target
+						target.px += fOverlap * ((ball.px - target.px) / fDistance);
+						target.py += fOverlap * ((ball.py - target.py) / fDistance);
+					}
 				}
 			}
 		}
 
 		// Handle Input
-		if (GetMouse(0).bHeld)
+		if (GetMouse(0).bPressed)
 		{
-			LaunchBall(GetMouseX(), GetMouseY());
+			pSelectedBall = nullptr;
+			for (auto& ball : vecBalls)
+			{
+				if (IsCircleSelected(ball.px, GetMouseX(), ball.py, GetMouseY(), ball.radius))
+				{
+					pSelectedBall = &ball;
+					break;
+				}
+			}
 		}
 		
 		Clear(olc::BLACK);
@@ -83,6 +119,7 @@ public:
 private:
 	// Vector of balls
 	vector<sBall> vecBalls;
+	sBall* pSelectedBall = nullptr;
 
 	void AddBall(float x, float y, float r = 5.0f)
 	{

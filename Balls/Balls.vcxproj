@@ -152,6 +152,7 @@
   <ItemGroup>
     <Image Include="detecting_collisions.png" />
     <Image Include="drawing_circles.png" />
+    <Image Include="selected_circle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
