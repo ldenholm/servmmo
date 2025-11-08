@@ -74,8 +74,23 @@ public:
 						
 						// Distance between ball centers:
 						float fDistance = sqrtf((target.px - ball.px) * (target.px - ball.px) + (target.py - ball.py) * (target.py - ball.py));
+						
+						/* Classic physics way of summing vectors so the sign is correct.
+						* Just to nail this point home should I need reminding in the future. Think back to kinematics.
+						* We have fDistance, r1, r2. We know overlap (displacement) is the sum of the radii minus the 
+						* distance between centers of the balls: r1+r2 - fDistance.
+						* But when we do the summation like this, we (for no good reason) swap the sign of fDistance
+						* so we give it the direction along the -x axis. This is why we do the summation: fDistance - r1 - r2.
+						* We leave fDistance sign unchanged and simply subtrace r1 and r2. This way fDistance maintains 
+						* its direction information and sign after the sum tells us the correct  direction of the 
+						* displacement vector. Phew that took some explaining but good to revisit by classical
+						* mechanics days! 
+						*/
+
+						float fOverlap = fDistance - ball.radius - target.radius;
+						
 						// We only need d/2 and it has negative sign so we can use it to displace the balls.
-						float fOverlap = 0.5f * (fDistance - ball.radius - target.radius);
+						fOverlap *= 0.5f;
 
 						// Displace ball.
 						// This is simply u = v/||v||, to get a unit vector in the direction of our displacement
