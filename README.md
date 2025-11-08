@@ -1,3 +1,3 @@
 ## Initial Collisions
 
-[Init_Collision](Balls/Init_Collision.gif)
+![Init_Collision](Balls/Init_Collision.gif)
