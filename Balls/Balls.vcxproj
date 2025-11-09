@@ -150,6 +150,7 @@
     <ClInclude Include="olcPixelGameEngine.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="C:\Users\Loki\Documents\ShareX\Screenshots\2025-11\velocity_drag.gif" />
     <Image Include="detecting_collisions.png" />
     <Image Include="drawing_circles.png" />
     <Image Include="Init_Collision.gif" />

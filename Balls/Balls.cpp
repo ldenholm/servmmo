@@ -33,12 +33,17 @@ public:
 	{
 		
 		float fDefaultRadius = 4.0f;
-		AddBall(ScreenWidth() * 0.25, ScreenWidth() * 0.25, fDefaultRadius);
-		AddBall(ScreenWidth() * 0.75, ScreenWidth() * 0.25, fDefaultRadius);
+		/*AddBall(ScreenWidth() * 0.25, ScreenWidth() * 0.25, fDefaultRadius);
+		AddBall(ScreenWidth() * 0.75, ScreenWidth() * 0.25, fDefaultRadius);*/
+
+		for (int i = 0; i < 10; i++)
+		{
+			AddBall(rand() % ScreenWidth(), rand() % ScreenWidth(), fDefaultRadius);
+		}
 		return true;
 	}
 
-	bool OnUserUpdate(float fElapsed) override
+	bool OnUserUpdate(float fElapsedTime) override
 	{
 
 		// Check circles overlap
@@ -57,6 +62,39 @@ public:
 			{
 				return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) < (radius * radius));
 			};
+
+		// Track colliding balls.
+		vector<pair<sBall*, sBall*>> collidingPairs;
+
+		// Update ball positions.
+		for (auto& ball : vecBalls)
+		{
+			// Introduce some drag.
+			ball.ax = -0.8f * ball.vx;
+			ball.ay = -0.8f * ball.vy;
+
+			// V = at, m/s = m/s^2 * s
+			// p = m/s * s
+			ball.vx += ball.ax * fElapsedTime;
+			ball.vy += ball.ay * fElapsedTime;
+			ball.px += ball.vx * fElapsedTime;
+			ball.py += ball.vy * fElapsedTime;
+
+			// Balls travel through screen bounds.
+			if (ball.px < 0) ball.px += (float)ScreenWidth();
+			if (ball.px >= ScreenWidth()) ball.px -= (float)ScreenWidth();
+			if (ball.py < 0) ball.py += (float)ScreenHeight();
+			if (ball.py >= ScreenHeight()) ball.py -= (float)ScreenHeight();
+
+			// Breaks conservation of momentum.
+			// For speeds < 0.01 we hardcode them to 0.
+			if (fabs(ball.vx * ball.vx + ball.vy * ball.vy) < 0.01f)
+			{
+				ball.vx = 0;
+				ball.vy = 0;
+			}
+
+		}
 		
 		// Collision detection (quadratic, replace with uniform grid).
 		for (auto& ball : vecBalls)
@@ -71,6 +109,9 @@ public:
 						// Collision detected, resolve by translating balls d/2 in opposite direction
 						// of the collision, where d is the magnitude of the displacement vector.
 						// Note that (r1 + r2) - sqrt(a^2+b^2) yields the magnitude of the displacement vector.
+
+						// First track them in our vector.
+						collidingPairs.push_back({ &ball, &target });
 						
 						// Distance between ball centers:
 						float fDistance = sqrtf((target.px - ball.px) * (target.px - ball.px) + (target.py - ball.py) * (target.py - ball.py));
@@ -108,7 +149,7 @@ public:
 		}
 
 		// Handle Input
-		if (GetMouse(0).bPressed)
+		if (GetMouse(0).bPressed || GetMouse(1).bPressed)
 		{
 			pSelectedBall = nullptr;
 			for (auto& ball : vecBalls)
@@ -117,7 +158,7 @@ public:
 				{
 					pSelectedBall = &ball;
 #ifdef _DEBUG
-					cout << "Seleced ball: " << pSelectedBall->id;
+					cout << "Seleced ball: " << pSelectedBall->id << endl;
 #endif
 					break;
 				}
@@ -138,13 +179,41 @@ public:
 		{
 			pSelectedBall = nullptr;
 		}
+
+		// Apply velocity to selected ball on RMB release.
+		if (GetMouse(1).bReleased)
+		{
+			if (pSelectedBall != nullptr)
+			{
+				// Create vector from mouse pointer to center of the ball
+				// and multiply velocity by this vector.
+				pSelectedBall->vx = 5.0f * ((pSelectedBall->px - (float)GetMouseX()));
+				pSelectedBall->vy = 5.0f * ((pSelectedBall->py - (float)GetMouseY()));
+			}
+			pSelectedBall = nullptr;
+		}
 		
 		Clear(olc::BLACK);
+
+		// Visualize dynamic collisions.
+		for (auto c : collidingPairs)
+		{
+			// Draw line from center of one the colliding pair to its counterpart.
+			DrawLine(c.first->px, c.first->py, c.second->px, c.second->py, olc::WHITE);
+		}
+
 
 		// Draw balls
 		for (auto &i : vecBalls)
 		{
 			DrawCircle((int)i.px, (int)i.py, (int)i.radius, olc::CYAN);
+		}
+
+		// Draw velocity vector visualization.
+		if (pSelectedBall != nullptr)
+		{
+			// Line from selected balls center to the mouse coordinates.
+			DrawLine(pSelectedBall->px, pSelectedBall->py, GetMouseX(), GetMouseY(), olc::DARK_GREY);
 		}
 			
 		return true;

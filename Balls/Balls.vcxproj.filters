@@ -37,5 +37,8 @@
     <Image Include="Init_Collision.gif">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="C:\Users\Loki\Documents\ShareX\Screenshots\2025-11\velocity_drag.gif">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
