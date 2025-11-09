@@ -17,7 +17,7 @@ namespace smmo
 
 		// We're going to need AABB for the quick checks to determine
 		// whether our balls might be colliding.
-		
+
 		// Defines a bounding box (approximate)
 		// for a game object.
 		struct AABB
@@ -28,7 +28,15 @@ namespace smmo
 			float y_max;
 		};
 
-		//AABB getAABB()
+		// Returns a bounding box for provided ball.
+		AABB getAABB(const sBall& ball)
+		{
+			return {
+				.x_min = ball.px - ball.radius,
+				.x_max = ball.px + ball.radius,
+				.y_min = ball.py - ball.radius,
+				.y_max = ball.py + ball.radius, };
+		}
 
 		class qtree
 		{
