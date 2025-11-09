@@ -4,19 +4,9 @@
 #include <cmath>
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "data_qtree.h"
 
 using namespace std;
-
-
-struct sBall
-{
-	int id;
-	float px, py;
-	float vx, vy;
-	float ax, ay;
-	float radius;
-};
-
 
 
 class CirclePhysics : public olc::PixelGameEngine
@@ -33,10 +23,8 @@ public:
 	{
 		
 		float fDefaultRadius = 4.0f;
-		/*AddBall(ScreenWidth() * 0.25, ScreenWidth() * 0.25, fDefaultRadius);
-		AddBall(ScreenWidth() * 0.75, ScreenWidth() * 0.25, fDefaultRadius);*/
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 4000; i++)
 		{
 			AddBall(rand() % ScreenWidth(), rand() % ScreenWidth(), fDefaultRadius);
 		}
@@ -64,7 +52,7 @@ public:
 			};
 
 		// Track colliding balls.
-		vector<pair<sBall*, sBall*>> collidingPairs;
+		vector<pair<smmo::data::sBall*, smmo::data::sBall*>> collidingPairs;
 
 		// Update ball positions.
 		for (auto& ball : vecBalls)
@@ -221,12 +209,12 @@ public:
 
 private:
 	// Vector of balls
-	vector<sBall> vecBalls;
-	sBall* pSelectedBall = nullptr;
+	vector<smmo::data::sBall> vecBalls;
+	smmo::data::sBall* pSelectedBall = nullptr;
 
 	void AddBall(float x, float y, float r = 5.0f)
 	{
-		sBall b = {
+		smmo::data::sBall b = {
 			.px = x, .py = y,
 			.vx = 0, .vy = 0,
 			.ax = 0, .ay = 0,
@@ -250,7 +238,7 @@ private:
 int main()
 {
 	CirclePhysics game;
-	if (game.Construct(160, 160, 8, 8))
+	if (game.Construct(1920, 1080, 8, 8))
 		game.Start();
 	else
 		cout << "Could not initialize game";
