@@ -11,11 +11,21 @@ int main()
 {
     Grid g(8, 8);
     g.Build();
-    Coord_2D first{ 3, 7 };
-    if (first.Coord_2D_WithinGrid(g.Height(), g.Width()))
+    Coord_2D first{ 0, 0 };
+    
+    for (auto& neighbor : Neighbors(g, first))
     {
-        std::cout << "Coord is within grid";
+        cout << "neighbor point, x: " << neighbor.x
+            << " y: " << neighbor.y << endl;
     }
-    else { std::cout << "Coord lies outside grid."; }
+
+    cout << "test second coord." << endl;
+
+    Coord_2D second{ 4, 4 };
+    for (auto& neighbor : Neighbors(g, second))
+    {
+        cout << "neighbor point, x: " << neighbor.x
+            << " y: " << neighbor.y << endl;
+    }
     
 }

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -9,14 +10,11 @@ namespace smmo
 {
 	namespace paths
 	{
-
 		struct Coord_2D {
 			int x, y;
-			bool Coord_2D_WithinGrid(int iGrdH, int iGrdW) {
-				return (x >= 0 && x <= iGrdH && y >= 0 && y <= iGrdW);
-			}
+			// constructor for temp rvalue coords
+			Coord_2D(int x, int y) : x(x), y(y) {};
 		};
-
 
 		class Grid {
 
@@ -64,6 +62,33 @@ namespace smmo
 				}
 
 			}
+
+			bool Coord_2D_WithinGrid(Coord_2D coord) const
+			{
+				return (coord.x >= 0 && coord.x <= m_iHeight && coord.y >= 0 && coord.y <= m_iWidth);
+			}
 		};
+
+		vector<Coord_2D> Neighbors(const Grid& g, Coord_2D coord)
+		{
+			// up/down/left/right 4 way movement.
+			vector<Coord_2D> neighbors;
+			vector<pair<int, int>> offsets =
+			{
+				{coord.x, coord.y - 1}, {coord.x, coord.y + 1},
+				{coord.x - 1, coord.y}, {coord.x + 1, coord.y}
+			};
+
+			for (auto& offset : offsets)
+			{
+				Coord_2D potentialNextCoord = { offset.first, offset.second };
+				if (g.Coord_2D_WithinGrid(potentialNextCoord))
+				{
+					neighbors.emplace_back(potentialNextCoord);
+				}
+			}
+
+			return neighbors;
+		}
 	}
 }
