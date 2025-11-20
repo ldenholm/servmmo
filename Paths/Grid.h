@@ -19,14 +19,20 @@ namespace smmo
 
 
 		class Grid {
+
+		private:
+			int m_iHeight, m_iWidth;
+
 		public:
-			int height, width;
 			vector<vector<int>> grid;
 
-			Grid(int h, int w) : height(h), width(w)
+			Grid(int h, int w) : m_iHeight(h), m_iWidth(w)
 			{
 				grid = vector<vector<int>>(h, vector<int>(w));
 			}
+
+			int Height() { return m_iHeight; }
+			int Width() { return m_iWidth; }
 
 		public:
 			// Creates walls and uses 0 = walkable, 1 = wall
@@ -34,13 +40,13 @@ namespace smmo
 			void Build()
 			{
 				try {
-					for (int i = 0; i < height; i++)
+					for (int i = 0; i < m_iHeight; i++)
 					{
 						//cout << "[";
-						for (int j = 0; j < width; j++)
+						for (int j = 0; j < m_iWidth; j++)
 						{
 							int cell = grid.at(i).at(j);
-							if (i == 0 || i == (height - 1) || j == 0 || j == (width - 1))
+							if (i == 0 || i == (m_iHeight - 1) || j == 0 || j == (m_iWidth - 1))
 							{
 								cell = 1;
 								// print wall
