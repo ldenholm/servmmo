@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <utility>
+#include <limits>
 
 using namespace std;
 
@@ -16,6 +17,18 @@ namespace smmo
 			Coord_2D(int x, int y) : x(x), y(y) {};
 		};
 
+		struct Node {
+			Coord_2D coord;
+			int cost_so_far;
+
+			Node(Coord_2D coord, int cost_so_far) : coord(coord), cost_so_far(cost_so_far) {};
+
+			bool operator <(const Node& other) const {
+				// lower cost is considered higher priority
+				return cost_so_far > other.cost_so_far;
+			}
+		};
+
 		class Grid {
 
 		private:
@@ -23,18 +36,24 @@ namespace smmo
 
 		public:
 			vector<vector<int>> grid;
+			vector<vector<float>> gscore_table;
+
+
+		public:
 
 			Grid(int h, int w) : m_iHeight(h), m_iWidth(w)
 			{
 				grid = vector<vector<int>>(h, vector<int>(w));
+				gscore_table = vector<vector<float>>(h, vector<float>(w));
 			}
 
 			int Height() { return m_iHeight; }
 			int Width() { return m_iWidth; }
 
-		public:
+
 			// Creates walls and uses 0 = walkable, 1 = wall
 			// Printing: # = wall, . = walkable.
+			// Initializes gscore table.
 			void Build()
 			{
 				try {
@@ -52,6 +71,9 @@ namespace smmo
 							}
 							// using this for easy bounds checking.
 							else { cell = 0; cout << "."; }
+
+							// g score init:
+							gscore_table.at(i).at(j) = numeric_limits<float>::infinity();
 						}
 
 						cout << endl;
