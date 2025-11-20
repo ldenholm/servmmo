@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <limits>
+#include <optional>
 
 using namespace std;
 
@@ -37,6 +38,7 @@ namespace smmo
 		public:
 			vector<vector<int>> grid;
 			vector<vector<float>> gscore_table;
+			vector<vector<optional<Coord_2D>>> came_from_table;
 
 
 		public:
@@ -45,6 +47,7 @@ namespace smmo
 			{
 				grid = vector<vector<int>>(h, vector<int>(w));
 				gscore_table = vector<vector<float>>(h, vector<float>(w));
+				came_from_table = vector<vector<optional<Coord_2D>>>(h, vector<optional<Coord_2D>>(w));
 			}
 
 			int Height() { return m_iHeight; }
