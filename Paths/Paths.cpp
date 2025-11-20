@@ -9,5 +9,4 @@ int main()
 {
     Grid g(8, 8);
     g.Build();
-    std::cout << "Hello World!\n";
 }
