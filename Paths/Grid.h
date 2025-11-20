@@ -5,6 +5,7 @@
 #include <utility>
 #include <limits>
 #include <optional>
+#include <queue>
 
 using namespace std;
 
@@ -20,9 +21,9 @@ namespace smmo
 
 		struct Node {
 			Coord_2D coord;
-			int cost_so_far;
+			float cost_so_far;
 
-			Node(Coord_2D coord, int cost_so_far) : coord(coord), cost_so_far(cost_so_far) {};
+			Node(Coord_2D coord, float cost_so_far) : coord(coord), cost_so_far(cost_so_far) {};
 
 			bool operator <(const Node& other) const {
 				// lower cost is considered higher priority
@@ -90,30 +91,11 @@ namespace smmo
 
 			bool Coord_2D_WithinGrid(Coord_2D coord) const
 			{
-				return (coord.x >= 0 && coord.x <= m_iHeight && coord.y >= 0 && coord.y <= m_iWidth);
+				return (coord.x >= 0 && coord.x < m_iHeight && coord.y >= 0 && coord.y < m_iWidth);
 			}
+
+			
 		};
 
-		vector<Coord_2D> Neighbors(const Grid& g, Coord_2D coord)
-		{
-			// up/down/left/right 4 way movement.
-			vector<Coord_2D> neighbors;
-			vector<pair<int, int>> offsets =
-			{
-				{coord.x, coord.y - 1}, {coord.x, coord.y + 1},
-				{coord.x - 1, coord.y}, {coord.x + 1, coord.y}
-			};
-
-			for (auto& offset : offsets)
-			{
-				Coord_2D potentialNextCoord = { offset.first, offset.second };
-				if (g.Coord_2D_WithinGrid(potentialNextCoord))
-				{
-					neighbors.emplace_back(potentialNextCoord);
-				}
-			}
-
-			return neighbors;
-		}
 	}
 }

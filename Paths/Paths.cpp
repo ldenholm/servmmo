@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "Grid.h"
+#include "Neighbors.h"
 
 using namespace smmo::paths;
 
@@ -13,7 +14,7 @@ int main()
     g.Build();
     Coord_2D first{ 0, 0 };
     
-    for (auto& neighbor : Neighbors(g, first))
+    for (auto& neighbor : smmo::dijkstra::Neighbors(g, first))
     {
         cout << "neighbor point, x: " << neighbor.x
             << " y: " << neighbor.y << endl;
@@ -22,10 +23,12 @@ int main()
     cout << "test second coord." << endl;
 
     Coord_2D second{ 4, 4 };
-    for (auto& neighbor : Neighbors(g, second))
+    for (auto& neighbor : smmo::dijkstra::Neighbors(g, second))
     {
         cout << "neighbor point, x: " << neighbor.x
             << " y: " << neighbor.y << endl;
     }
     
+
+    smmo::dijkstra::Dijkstra(g, g.gscore_table, g.came_from_table, first, second);
 }
