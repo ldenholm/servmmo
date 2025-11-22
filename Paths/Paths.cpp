@@ -31,4 +31,8 @@ int main()
     
 
     smmo::dijkstra::Dijkstra(g, g.gscore_table, g.came_from_table, first, second);
+
+
+    cout << "test print fn" << endl << endl;
+    g.Print();
 }

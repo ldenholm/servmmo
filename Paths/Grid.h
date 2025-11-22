@@ -63,18 +63,17 @@ namespace smmo
 				try {
 					for (int i = 0; i < m_iHeight; i++)
 					{
-						//cout << "[";
 						for (int j = 0; j < m_iWidth; j++)
 						{
-							int cell = grid.at(i).at(j);
+							 
 							if (i == 0 || i == (m_iHeight - 1) || j == 0 || j == (m_iWidth - 1))
 							{
-								cell = 1;
+								grid.at(i).at(j) = 1;
 								// print wall
 								cout << "#";
 							}
 							// using this for easy bounds checking.
-							else { cell = 0; cout << "."; }
+							else { grid.at(i).at(j) = 0; cout << "."; }
 
 							// g score init:
 							gscore_table.at(i).at(j) = numeric_limits<float>::infinity();
@@ -89,14 +88,37 @@ namespace smmo
 
 			}
 
-			bool Coord_2D_WithinGrid(Coord_2D coord) const
+			bool Coord_2D_WithinGrid(const Coord_2D& coord) const
 			{
 				return (coord.x >= 0 && coord.x < m_iHeight && coord.y >= 0 && coord.y < m_iWidth);
 			}
 
-			bool Coord_Is_Walkable(Coord_2D coord) const
+			bool Coord_Is_Walkable(const Coord_2D& coord) const
 			{
 				return (grid.at(coord.y).at(coord.x) == 0);
+			}
+
+			void Print() const
+			{
+				for (auto& row : grid)
+				{
+					for (auto& col : row)
+					{
+						if (col == 1) { cout << "#"; }
+						else { cout << "0"; }
+					}
+					cout << endl;
+				}
+			}
+
+			void SetWall(const Coord_2D& coord)
+			{
+				try {
+					grid.at(coord.y).at(coord.x) = 1;
+				}
+				catch (out_of_range& oor) {
+					cout << oor.what() << "failed to set wall, out of bounds.";
+				}
 			}
 			
 		};
