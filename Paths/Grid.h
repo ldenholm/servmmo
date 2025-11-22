@@ -98,6 +98,11 @@ namespace smmo
 				return (grid.at(coord.y).at(coord.x) == 0);
 			}
 
+			bool Coord_Walkable_And_WithinGrid(const Coord_2D& coord) const
+			{
+				return (Coord_2D_WithinGrid(coord) && Coord_Is_Walkable(coord));
+			}
+
 			void Print() const
 			{
 				for (auto& row : grid)

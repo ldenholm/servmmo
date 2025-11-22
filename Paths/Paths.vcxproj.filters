@@ -23,7 +23,7 @@
     <ClInclude Include="Grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Neighbors.h">
+    <ClInclude Include="Pathing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

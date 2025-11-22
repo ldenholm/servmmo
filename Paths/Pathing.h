@@ -7,7 +7,7 @@ using namespace std;
 
 namespace smmo 
 {
-	namespace dijkstra
+	namespace pathing
 	{
 		vector<smmo::paths::Coord_2D> Neighbors(const smmo::paths::Grid& g, smmo::paths::Coord_2D coord)
 		{
@@ -35,6 +35,14 @@ namespace smmo
 			vector<vector<float>> gscore_table, vector<vector<optional<smmo::paths::Coord_2D>>> came_from_table,
 			const smmo::paths::Coord_2D& start, const smmo::paths::Coord_2D& goal)
 		{
+			// first quickly check the start and goal coords are walkable.
+			if (!(g.Coord_Walkable_And_WithinGrid(start) && g.Coord_Walkable_And_WithinGrid(goal)))
+			{
+				std::cout << "Start/Goal Coords neither within grid nor walkable, please update." << endl;
+				return;
+			}
+
+
 			priority_queue<smmo::paths::Node> pQueue;
 			pQueue.push({ start, 0 });
 			gscore_table[start.y][start.x] = 0;
@@ -45,7 +53,7 @@ namespace smmo
 				pQueue.pop();
 				if (current.coord.x == goal.x && current.coord.y == goal.y)
 				{
-					cout << "arrived at the goal!!!" << endl;
+					std::cout << "arrived at the goal!!!" << endl;
 					return;
 				}
 				else
@@ -67,7 +75,7 @@ namespace smmo
 				}
 			}
 
-			cout << "cost of the shortest path: " << gscore_table[goal.y][goal.x] << endl;
+			std::cout << "cost of the shortest path: " << gscore_table[goal.y][goal.x] << endl;
 
 		}
 	}
