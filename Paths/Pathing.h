@@ -2,6 +2,8 @@
 
 #include "Grid.h"
 #include <vector>
+#include <optional>
+#include <algorithm>
 
 using namespace std;
 
@@ -9,6 +11,29 @@ namespace smmo
 {
 	namespace pathing
 	{
+
+		void ReconstructPath(const vector<vector<optional<smmo::paths::Coord_2D>>>& came_from_table, const smmo::paths::Coord_2D& finalCoord)
+		{
+			vector<smmo::paths::Coord_2D> path;
+			smmo::paths::Coord_2D currentCoord = finalCoord; // copy ctor
+			while (came_from_table[currentCoord.y][currentCoord.x].has_value()) // while a valid came from coord exists.
+			{
+				path.push_back(currentCoord);
+				smmo::paths::Coord_2D came_from_coord = came_from_table[currentCoord.y][currentCoord.x].value();
+				currentCoord = { came_from_coord.x, came_from_coord.y };
+			}
+
+			// reverse our path
+			reverse(path.begin(), path.end());
+
+			cout << "Path we discovered: " << endl;
+
+			for (auto& p : path)
+			{
+				cout << "x: " << p.x << " y: " << p.y << endl;
+			}
+		}
+
 		vector<smmo::paths::Coord_2D> Neighbors(const smmo::paths::Grid& g, smmo::paths::Coord_2D coord)
 		{
 			// up/down/left/right 4 way movement.
@@ -31,8 +56,9 @@ namespace smmo
 			return neighbors;
 		}
 
+
 		void Dijkstra(const smmo::paths::Grid& g, 
-			vector<vector<float>> gscore_table, vector<vector<optional<smmo::paths::Coord_2D>>> came_from_table,
+			vector<vector<float>>& gscore_table, vector<vector<optional<smmo::paths::Coord_2D>>>& came_from_table,
 			const smmo::paths::Coord_2D& start, const smmo::paths::Coord_2D& goal)
 		{
 			// first quickly check the start and goal coords are walkable.
@@ -54,6 +80,7 @@ namespace smmo
 				if (current.coord.x == goal.x && current.coord.y == goal.y)
 				{
 					std::cout << "arrived at the goal!!!" << endl;
+					ReconstructPath(came_from_table, current.coord);
 					return;
 				}
 				else
