@@ -94,6 +94,10 @@ namespace smmo
 				return (coord.x >= 0 && coord.x < m_iHeight && coord.y >= 0 && coord.y < m_iWidth);
 			}
 
+			bool Coord_Is_Walkable(Coord_2D coord) const
+			{
+				return (grid.at(coord.y).at(coord.x) == 0);
+			}
 			
 		};
 

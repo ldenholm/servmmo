@@ -22,7 +22,7 @@ namespace smmo
 			for (auto& offset : offsets)
 			{
 				smmo::paths::Coord_2D potentialNextCoord = { offset.first, offset.second };
-				if (g.Coord_2D_WithinGrid(potentialNextCoord))
+				if (g.Coord_2D_WithinGrid(potentialNextCoord) && g.Coord_Is_Walkable(potentialNextCoord))
 				{
 					neighbors.emplace_back(potentialNextCoord);
 				}
