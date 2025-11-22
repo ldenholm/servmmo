@@ -9,7 +9,7 @@ int main()
 {
     Grid g(8, 8);
     g.Build();
-    Coord_2D first{ 0, 0 };
+    Coord_2D first{ 1, 1 };
     
     for (auto& neighbor : smmo::pathing::Neighbors(g, first))
     {
@@ -19,17 +19,17 @@ int main()
 
     cout << "test second coord." << endl;
 
-    Coord_2D second{ 4, 4 };
+    Coord_2D second{ 6, 1 };
     for (auto& neighbor : smmo::pathing::Neighbors(g, second))
     {
         cout << "neighbor point, x: " << neighbor.x
             << " y: " << neighbor.y << endl;
     }
     
+    g.SetWall({ 4, 1 });
+    g.SetWall({ 4, 2 });
+    g.SetWall({ 4, 3 });
+    g.SetWall({ 4, 4 });
 
     smmo::pathing::Dijkstra(g, g.gscore_table, g.came_from_table, first, second);
-
-
-    cout << "test print fn" << endl << endl;
-    g.Print();
 }

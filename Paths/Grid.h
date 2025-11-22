@@ -120,9 +120,12 @@ namespace smmo
 			{
 				try {
 					grid.at(coord.y).at(coord.x) = 1;
+					cout << "===========================new map layout===========================" << endl << endl;
+					Print();
 				}
 				catch (out_of_range& oor) {
 					cout << oor.what() << "failed to set wall, out of bounds.";
+					return;
 				}
 			}
 			
