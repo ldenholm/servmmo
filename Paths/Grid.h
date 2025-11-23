@@ -8,8 +8,6 @@
 #include <queue>
 #include <cmath>
 
-using namespace std;
-
 namespace smmo
 {
 	namespace paths
@@ -22,7 +20,7 @@ namespace smmo
 
 		struct Node {
 			Coord_2D coord;
-			float cost_so_far;			
+			float cost_so_far;
 
 			Node(Coord_2D coord, float cost_so_far) : coord(coord), cost_so_far(cost_so_far) {};
 
@@ -32,24 +30,37 @@ namespace smmo
 			}
 		};
 
+		struct Node_AStar {
+			Coord_2D coord;
+			float cost_so_far;
+			float f_cost = 0.0f;
+
+			Node_AStar(Coord_2D coord, float cost_so_far, float f_cost) : coord(coord), cost_so_far(cost_so_far), f_cost(f_cost) {};
+
+			bool operator <(const Node_AStar& other) const {
+				// lower cost is considered higher priority
+				return f_cost > other.f_cost;
+			}
+		};
+
 		class Grid {
 
 		private:
 			int m_iHeight, m_iWidth;
 
 		public:
-			vector<vector<int>> grid;
-			vector<vector<float>> gscore_table;
-			vector<vector<optional<Coord_2D>>> came_from_table;
+			std::vector<std::vector<int>> grid;
+			std::vector<std::vector<float>> gscore_table;
+			std::vector<std::vector<std::optional<Coord_2D>>> came_from_table;
 
 
 		public:
 
 			Grid(int h, int w) : m_iHeight(h), m_iWidth(w)
 			{
-				grid = vector<vector<int>>(h, vector<int>(w));
-				gscore_table = vector<vector<float>>(h, vector<float>(w));
-				came_from_table = vector<vector<optional<Coord_2D>>>(h, vector<optional<Coord_2D>>(w));
+				grid = std::vector<std::vector<int>>(h, std::vector<int>(w));
+				gscore_table = std::vector<std::vector<float>>(h, std::vector<float>(w));
+				came_from_table = std::vector<std::vector<std::optional<Coord_2D>>>(h, std::vector<std::optional<Coord_2D>>(w));
 			}
 
 			int Height() { return m_iHeight; }
@@ -71,20 +82,20 @@ namespace smmo
 							{
 								grid.at(i).at(j) = 1;
 								// print wall
-								cout << "#";
+								std::cout << "#";
 							}
 							// using this for easy bounds checking.
-							else { grid.at(i).at(j) = 0; cout << "."; }
+							else { grid.at(i).at(j) = 0; std::cout << "."; }
 
 							// g score init:
-							gscore_table.at(i).at(j) = numeric_limits<float>::infinity();
+							gscore_table.at(i).at(j) = std::numeric_limits<float>::infinity();
 						}
 
-						cout << endl;
+						std::cout << std::endl;
 					}
 				}
-				catch (const out_of_range oor) {
-					cout << oor.what() << endl;
+				catch (const std::out_of_range oor) {
+					std::cout << oor.what() << std::endl;
 				}
 
 			}
@@ -110,10 +121,10 @@ namespace smmo
 				{
 					for (auto& col : row)
 					{
-						if (col == 1) { cout << "#"; }
-						else { cout << "0"; }
+						if (col == 1) { std::cout << "#"; }
+						else { std::cout << "0"; }
 					}
-					cout << endl;
+					std::cout << std::endl;
 				}
 			}
 
@@ -121,22 +132,14 @@ namespace smmo
 			{
 				try {
 					grid.at(coord.y).at(coord.x) = 1;
-					cout << "===========================new map layout===========================" << endl << endl;
+					std::cout << "===========================new map layout===========================" << std::endl << std::endl;
 					Print();
 				}
-				catch (out_of_range& oor) {
-					cout << oor.what() << "failed to set wall, out of bounds.";
+				catch (std::out_of_range& oor) {
+					std::cout << oor.what() << "failed to set wall, out of bounds.";
 					return;
 				}
 			}
-
-			float Heuristic(Coord_2D& start, Coord_2D& goal)
-			{
-				// manhattan distance (L1 norm)
-				// not sure this is the right place for this fn
-				return static_cast<float>(abs(start.x - goal.x) + abs(start.y - goal.y));
-			}
-			
 		};
 
 	}

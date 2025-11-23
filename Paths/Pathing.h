@@ -5,16 +5,20 @@
 #include <optional>
 #include <algorithm>
 
-using namespace std;
-
 namespace smmo 
 {
 	namespace pathing
 	{
 
-		void ReconstructPath(const vector<vector<optional<smmo::paths::Coord_2D>>>& came_from_table, const smmo::paths::Coord_2D& finalCoord)
+		inline float Heuristic(const smmo::paths::Coord_2D& start, const smmo::paths::Coord_2D& goal)
 		{
-			vector<smmo::paths::Coord_2D> path;
+			// manhattan distance (L1 norm)
+			return static_cast<float>(abs(start.x - goal.x) + abs(start.y - goal.y));
+		}
+
+		void ReconstructPath(const std::vector<std::vector<std::optional<smmo::paths::Coord_2D>>>& came_from_table, const smmo::paths::Coord_2D& finalCoord)
+		{
+			std::vector<smmo::paths::Coord_2D> path;
 			smmo::paths::Coord_2D currentCoord = finalCoord; // copy ctor
 			while (came_from_table[currentCoord.y][currentCoord.x].has_value()) // while a valid came from coord exists.
 			{
@@ -26,19 +30,19 @@ namespace smmo
 			// reverse our path
 			reverse(path.begin(), path.end());
 
-			cout << "Path we discovered: " << endl;
+			std::cout << "Path we discovered: " << std::endl;
 
 			for (auto& p : path)
 			{
-				cout << "x: " << p.x << " y: " << p.y << endl;
+				std::cout << "x: " << p.x << " y: " << p.y << std::endl;
 			}
 		}
 
-		vector<smmo::paths::Coord_2D> Neighbors(const smmo::paths::Grid& g, smmo::paths::Coord_2D coord)
+		std::vector<smmo::paths::Coord_2D> Neighbors(const smmo::paths::Grid& g, smmo::paths::Coord_2D coord)
 		{
 			// up/down/left/right 4 way movement.
-			vector<smmo::paths::Coord_2D> neighbors;
-			vector<pair<int, int>> offsets =
+			std::vector<smmo::paths::Coord_2D> neighbors;
+			std::vector<std::pair<int, int>> offsets =
 			{
 				{coord.x, coord.y - 1}, {coord.x, coord.y + 1},
 				{coord.x - 1, coord.y}, {coord.x + 1, coord.y}
@@ -58,18 +62,18 @@ namespace smmo
 
 
 		void Dijkstra(const smmo::paths::Grid& g, 
-			vector<vector<float>>& gscore_table, vector<vector<optional<smmo::paths::Coord_2D>>>& came_from_table,
+			std::vector<std::vector<float>>& gscore_table, std::vector<std::vector<std::optional<smmo::paths::Coord_2D>>>& came_from_table,
 			const smmo::paths::Coord_2D& start, const smmo::paths::Coord_2D& goal)
 		{
 			// first quickly check the start and goal coords are walkable.
 			if (!(g.Coord_Walkable_And_WithinGrid(start) && g.Coord_Walkable_And_WithinGrid(goal)))
 			{
-				std::cout << "Start/Goal Coords neither within grid nor walkable, please update." << endl;
+				std::cout << "Start/Goal Coords neither within grid nor walkable, please update." << std::endl;
 				return;
 			}
 
 
-			priority_queue<smmo::paths::Node> pQueue;
+			std::priority_queue<smmo::paths::Node> pQueue;
 			pQueue.push({ start, 0 });
 			gscore_table[start.y][start.x] = 0;
 
@@ -79,7 +83,7 @@ namespace smmo
 				pQueue.pop();
 				if (current.coord.x == goal.x && current.coord.y == goal.y)
 				{
-					std::cout << "arrived at the goal!!!" << endl;
+					std::cout << "arrived at the goal!!!" << std::endl;
 					ReconstructPath(came_from_table, current.coord);
 					return;
 				}
@@ -101,9 +105,53 @@ namespace smmo
 					}
 				}
 			}
+		}
 
-			std::cout << "cost of the shortest path: " << gscore_table[goal.y][goal.x] << endl;
+		void AStar(const smmo::paths::Grid& g,
+			std::vector<std::vector<float>>& gscore_table, std::vector<std::vector<std::optional<smmo::paths::Coord_2D>>>& came_from_table,
+			const smmo::paths::Coord_2D& start, const smmo::paths::Coord_2D& goal)
+		{
+			// first quickly check the start and goal coords are walkable.
+			if (!(g.Coord_Walkable_And_WithinGrid(start) && g.Coord_Walkable_And_WithinGrid(goal)))
+			{
+				std::cout << "Start/Goal Coords neither within grid nor walkable, please update." << std::endl;
+				return;
+			}
 
+			// A* uses f_cost which is calculated via heuristic (l1 norm).
+			std::priority_queue<smmo::paths::Node_AStar> pQueue;
+			// g is zero at this stage.
+			pQueue.push({ start, 0.0f, Heuristic(start, goal) });
+			gscore_table[start.y][start.x] = 0;
+
+			while (!pQueue.empty())
+			{
+				smmo::paths::Node_AStar current = pQueue.top();
+				pQueue.pop();
+				if (current.coord.x == goal.x && current.coord.y == goal.y)
+				{
+					std::cout << "arrived at the goal!!!" << std::endl;
+					ReconstructPath(came_from_table, current.coord);
+					return;
+				}
+				else
+				{
+					for (auto& neighbor : Neighbors(g, current.coord))
+					{
+						// tentative cost: gscore[current] + move_cost.
+						// using move cost of 1 for a single step.
+						float tentative_cost = gscore_table[current.coord.y][current.coord.x] + 1.0f;
+						if (tentative_cost < gscore_table[neighbor.y][neighbor.x])
+						{
+							// discovered a better path to neighbor.
+							gscore_table[neighbor.y][neighbor.x] = tentative_cost;
+							came_from_table[neighbor.y][neighbor.x] = current.coord;
+							pQueue.push({ neighbor, tentative_cost, (tentative_cost + Heuristic(neighbor, goal))});
+						}
+						// pathing to n is worse or equal so ignore.
+					}
+				}
+			}
 		}
 	}
 }

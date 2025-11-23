@@ -13,17 +13,17 @@ int main()
     
     for (auto& neighbor : smmo::pathing::Neighbors(g, first))
     {
-        cout << "neighbor point, x: " << neighbor.x
-            << " y: " << neighbor.y << endl;
+        std::cout << "neighbor point, x: " << neighbor.x
+            << " y: " << neighbor.y << std::endl;
     }
 
-    cout << "test second coord." << endl;
+    std::cout << "test second coord." << std::endl;
 
     Coord_2D second{ 6, 1 };
     for (auto& neighbor : smmo::pathing::Neighbors(g, second))
     {
-        cout << "neighbor point, x: " << neighbor.x
-            << " y: " << neighbor.y << endl;
+        std::cout << "neighbor point, x: " << neighbor.x
+            << " y: " << neighbor.y << std::endl;
     }
     
     g.SetWall({ 4, 1 });
@@ -31,5 +31,8 @@ int main()
     g.SetWall({ 4, 3 });
     g.SetWall({ 4, 4 });
 
-    smmo::pathing::Dijkstra(g, g.gscore_table, g.came_from_table, first, second);
+    //smmo::pathing::Dijkstra(g, g.gscore_table, g.came_from_table, first, second);
+
+
+    smmo::pathing::AStar(g, g.gscore_table, g.came_from_table, first, second);
 }
