@@ -6,6 +6,7 @@
 #include <limits>
 #include <optional>
 #include <queue>
+#include <cmath>
 
 using namespace std;
 
@@ -21,7 +22,7 @@ namespace smmo
 
 		struct Node {
 			Coord_2D coord;
-			float cost_so_far;
+			float cost_so_far;			
 
 			Node(Coord_2D coord, float cost_so_far) : coord(coord), cost_so_far(cost_so_far) {};
 
@@ -127,6 +128,13 @@ namespace smmo
 					cout << oor.what() << "failed to set wall, out of bounds.";
 					return;
 				}
+			}
+
+			float Heuristic(Coord_2D& start, Coord_2D& goal)
+			{
+				// manhattan distance (L1 norm)
+				// not sure this is the right place for this fn
+				return static_cast<float>(abs(start.x - goal.x) + abs(start.y - goal.y));
 			}
 			
 		};
