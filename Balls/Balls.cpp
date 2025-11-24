@@ -24,7 +24,7 @@ public:
 		
 		float fDefaultRadius = 4.0f;
 
-		for (int i = 0; i < 4000; i++)
+		for (int i = 0; i < 20; i++)
 		{
 			AddBall(rand() % ScreenWidth(), rand() % ScreenWidth(), fDefaultRadius);
 		}
@@ -238,7 +238,7 @@ private:
 int main()
 {
 	CirclePhysics game;
-	if (game.Construct(1920, 1080, 8, 8))
+	if (game.Construct(200, 200, 8, 8))
 		game.Start();
 	else
 		cout << "Could not initialize game";
