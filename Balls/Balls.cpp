@@ -87,6 +87,9 @@ public:
 		// Collision detection (quadratic, replace with uniform grid).
 		for (auto& ball : vecBalls)
 		{
+			smmo::data::CreateAABB(ball);
+			bounding_boxes.push_back(ball.AABB);
+
 			for (auto& target : vecBalls)
 			{
 				if (ball.id != target.id)
@@ -197,6 +200,12 @@ public:
 			DrawCircle((int)i.px, (int)i.py, (int)i.radius, olc::CYAN);
 		}
 
+		// Draw AABBs
+		for (auto& sAABB : bounding_boxes)
+		{
+			DrawRect(sAABB.x_min, sAABB.y_min, (sAABB.x_max - sAABB.x_min), (sAABB.y_max - sAABB.y_min));
+		}
+
 		// Draw velocity vector visualization.
 		if (pSelectedBall != nullptr)
 		{
@@ -211,6 +220,7 @@ private:
 	// Vector of balls
 	vector<smmo::data::sBall> vecBalls;
 	smmo::data::sBall* pSelectedBall = nullptr;
+	vector<smmo::data::sAABB> bounding_boxes;
 
 	void AddBall(float x, float y, float r = 5.0f)
 	{
