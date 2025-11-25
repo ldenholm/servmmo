@@ -16,10 +16,11 @@ int main()
 
     for (int i = 0; i < image_height; i++)
     {
+        clog << "\rScanlines remaining: " << (image_height - i) << " " << flush;
         for (int j = 0; j < image_width; j++)
         {
-            auto r = double(i) / (image_width - 1);
-            auto g = double(j) / (image_height - 1);
+            auto r = double(j) / (image_width - 1);
+            auto g = double(i) / (image_height - 1);
             auto b = 0.0;
 
             int ir = (int)255.999 * r;
