@@ -52,6 +52,30 @@ namespace smmo
 			};
 		}
 
+		bool IntersectingAABB(const sAABB& a, const sAABB& b)
+		{
+			/* following conditions for NO overlap, using proof
+			 by contradiction:
+
+			  condition 1: box A right edge is to the left of box B left edge.
+			  condition 2: box A left edge is to the right of box B right edge.
+			  condition 3: if box A bottom edge is above box B top edge.
+			  condition 4: if box A top edge is below box B bottom edge.
+
+			  Any of these conditions signify no overlap so the converse
+			  proves an overlap.
+
+			 */
+
+			bool notOverlapping =
+				a.x_max < b.x_min ||
+				a.x_min > b.x_max ||
+				a.y_max < b.y_min ||
+				a.y_min > b.y_max;
+
+			return !notOverlapping;
+		}
+
 		class qtree
 		{
 		public:

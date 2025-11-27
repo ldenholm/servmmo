@@ -80,7 +80,7 @@ namespace smmo
 			// We care about queue internal state consistency considering
 			// multiple threads trying to push data to our queue.
 			std::mutex mQueue;
-			std::deque<T> mQueue;
+			std::deque<T> dQueue;
 		};
 	}
 }

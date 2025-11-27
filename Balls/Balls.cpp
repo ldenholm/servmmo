@@ -94,47 +94,51 @@ public:
 			{
 				if (ball.id != target.id)
 				{
-					if (DoCirclesOverlap(ball.px, ball.py, ball.radius, 
-						target.px, target.py, target.radius))
+					if (IntersectingAABB(ball.AABB, target.AABB))
 					{
-						// Collision detected, resolve by translating balls d/2 in opposite direction
-						// of the collision, where d is the magnitude of the displacement vector.
-						// Note that (r1 + r2) - sqrt(a^2+b^2) yields the magnitude of the displacement vector.
+						if (DoCirclesOverlap(ball.px, ball.py, ball.radius,
+							target.px, target.py, target.radius))
+						{
+							// Collision detected, resolve by translating balls d/2 in opposite direction
+							// of the collision, where d is the magnitude of the displacement vector.
+							// Note that (r1 + r2) - sqrt(a^2+b^2) yields the magnitude of the displacement vector.
 
-						// First track them in our vector.
-						collidingPairs.push_back({ &ball, &target });
-						
-						// Distance between ball centers:
-						float fDistance = sqrtf((target.px - ball.px) * (target.px - ball.px) + (target.py - ball.py) * (target.py - ball.py));
-						
-						/* Classic physics way of summing vectors so the sign is correct.
-						* Just to nail this point home should I need reminding in the future. Think back to kinematics.
-						* We have fDistance, r1, r2. We know overlap (displacement) is the sum of the radii minus the 
-						* distance between centers of the balls: r1+r2 - fDistance.
-						* But when we do the summation like this, we (for no good reason) swap the sign of fDistance
-						* so we give it the direction along the -x axis. This is why we do the summation: fDistance - r1 - r2.
-						* We leave fDistance sign unchanged and simply subtrace r1 and r2. This way fDistance maintains 
-						* its direction information and sign after the sum tells us the correct  direction of the 
-						* displacement vector. Phew that took some explaining but good to revisit by classical
-						* mechanics days! 
-						*/
+							// First track them in our vector.
+							collidingPairs.push_back({ &ball, &target });
 
-						float fOverlap = fDistance - ball.radius - target.radius;
-						
-						// We only need d/2 so we can use it to displace the balls.
-						fOverlap *= 0.5f;
+							// Distance between ball centers:
+							float fDistance = sqrtf((target.px - ball.px) * (target.px - ball.px) + (target.py - ball.py) * (target.py - ball.py));
 
-						// Displace ball.
-						// This is simply u = v/||v||, to get a unit vector in the direction of our displacement
-						// then simply scaling it by fOverlap. Note also ball moves away from the collision, and
-						// the converse is true for the target.
-						ball.px -= fOverlap * ((ball.px - target.px) / fDistance);
-						ball.py -= fOverlap * ((ball.py - target.py) / fDistance);
+							/* Classic physics way of summing vectors so the sign is correct.
+							* Just to nail this point home should I need reminding in the future. Think back to kinematics.
+							* We have fDistance, r1, r2. We know overlap (displacement) is the sum of the radii minus the
+							* distance between centers of the balls: r1+r2 - fDistance.
+							* But when we do the summation like this, we (for no good reason) swap the sign of fDistance
+							* so we give it the direction along the -x axis. This is why we do the summation: fDistance - r1 - r2.
+							* We leave fDistance sign unchanged and simply subtrace r1 and r2. This way fDistance maintains
+							* its direction information and sign after the sum tells us the correct  direction of the
+							* displacement vector. Phew that took some explaining but good to revisit by classical
+							* mechanics days!
+							*/
 
-						// Displace target
-						target.px += fOverlap * ((ball.px - target.px) / fDistance);
-						target.py += fOverlap * ((ball.py - target.py) / fDistance);
+							float fOverlap = fDistance - ball.radius - target.radius;
+
+							// We only need d/2 so we can use it to displace the balls.
+							fOverlap *= 0.5f;
+
+							// Displace ball.
+							// This is simply u = v/||v||, to get a unit vector in the direction of our displacement
+							// then simply scaling it by fOverlap. Note also ball moves away from the collision, and
+							// the converse is true for the target.
+							ball.px -= fOverlap * ((ball.px - target.px) / fDistance);
+							ball.py -= fOverlap * ((ball.py - target.py) / fDistance);
+
+							// Displace target
+							target.px += fOverlap * ((ball.px - target.px) / fDistance);
+							target.py += fOverlap * ((ball.py - target.py) / fDistance);
+						}
 					}
+					
 				}
 			}
 		}
