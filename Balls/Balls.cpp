@@ -160,7 +160,7 @@ public:
 		{
 			if (pSelectedBall != nullptr)
 			{
-				pSelectedBall->px = GetMouseX();
+				pSelectedBall->px = GetMouseX();				
 				pSelectedBall->py = GetMouseY();
 			}
 		}
@@ -198,12 +198,7 @@ public:
 		for (auto &i : vecBalls)
 		{
 			DrawCircle((int)i.px, (int)i.py, (int)i.radius, olc::CYAN);
-		}
-
-		// Draw AABBs
-		for (auto& sAABB : bounding_boxes)
-		{
-			DrawRect(sAABB.x_min, sAABB.y_min, (sAABB.x_max - sAABB.x_min), (sAABB.y_max - sAABB.y_min));
+			DrawRect(i.AABB.x_min, i.AABB.y_min, (i.AABB.x_max - i.AABB.x_min), (i.AABB.y_max - i.AABB.y_min));
 		}
 
 		// Draw velocity vector visualization.
