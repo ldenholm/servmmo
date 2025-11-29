@@ -36,5 +36,11 @@
     <ClInclude Include="net_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Maths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

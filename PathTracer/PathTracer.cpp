@@ -1,33 +1,41 @@
 #include <iostream>
 #include <fstream>
+#include "Image.h"
 
 using namespace std;
 
 int main()
 {
-    int image_height = 256;
-    int image_width = 256;
 
-    // Creating PPM file.
-    ofstream ofs("my_image.ppm");
-    cout.rdbuf(ofs.rdbuf());
 
-    cout << "P3\n" << image_height << " " << image_width << "\n255\n";
+    smmo::image::Image img(32, 32);
 
-    for (int i = 0; i < image_height; i++)
-    {
-        clog << "\rScanlines remaining: " << (image_height - i) << " " << flush;
-        for (int j = 0; j < image_width; j++)
-        {
-            auto r = double(j) / (image_width - 1);
-            auto g = double(i) / (image_height - 1);
-            auto b = 0.0;
+    img.DrawNSquareAtXY(4, 4, 10);
+    return img.Save("squareImage.ppm");
 
-            int ir = (int)255.999 * r;
-            int ig = (int)255.999 * g; // 255.999 * 1.0 = 255.
-            int ib = (int)255.999 * b;
+    //int image_height = 256;
+    //int image_width = 256;
 
-            cout << ir << " " << ig << " " << ib << "\n";
-        }
-    }
+    //// Creating PPM file.
+    //ofstream ofs("my_image.ppm");
+    //cout.rdbuf(ofs.rdbuf());
+
+    //cout << "P3\n" << image_height << " " << image_width << "\n255\n";
+
+    //for (int i = 0; i < image_height; i++)
+    //{
+    //    clog << "\rScanlines remaining: " << (image_height - i) << " " << flush;
+    //    for (int j = 0; j < image_width; j++)
+    //    {
+    //        auto r = double(j) / (image_width - 1);
+    //        auto g = double(i) / (image_height - 1);
+    //        auto b = 0.0;
+
+    //        int ir = (int)255.999 * r;
+    //        int ig = (int)255.999 * g; // 255.999 * 1.0 = 255.
+    //        int ib = (int)255.999 * b;
+
+    //        cout << ir << " " << ig << " " << ib << "\n";
+    //    }
+    //}
 }
