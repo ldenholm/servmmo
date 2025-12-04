@@ -11,9 +11,11 @@ namespace smmo
 	{
 		struct Pixel
 		{
-			uint8_t red;
-			uint8_t green;
-			uint8_t blue;
+			// uint8_t is an alias for unsigned char, so using 32bit ints to store r,g,b
+			// avoiding the cast when we save.
+			uint32_t red;
+			uint32_t green;
+			uint32_t blue;
 		};
 
 		class Image
@@ -57,7 +59,7 @@ namespace smmo
 					{
 						for (auto& pxl : row)
 						{
-							ofs << (int)pxl.red << " " << (int)pxl.green << " " << (int)pxl.blue << "\n";
+							ofs << pxl.red << " " << pxl.green << " " << pxl.blue << "\n";
 						}
 					}
 					return true;
@@ -91,10 +93,26 @@ namespace smmo
 				{
 					for (int j = x; j <= (x + N); j++)
 					{
+						if (i == y || i == y+N || j == x || j == x + N)
 						pixels[i][j] = { 0, 0, 0 };
 					}
 				}
 			}
+
+			// Draw filled square of N length (pixels) at the XY offset.
+			void DrawNFilledSquareAtXY(int32_t x, int32_t y, int32_t N)
+			{
+
+				// Hardcoding color to black but this should be an argument.
+				for (int i = y; i <= (y + N); i++)
+				{
+					for (int j = x; j <= (x + N); j++)
+					{
+							pixels[i][j] = { 0, 0, 0 };
+					}
+				}
+			}
+
 
 		private:
 			
