@@ -57,7 +57,7 @@ namespace smmo
 					{
 						for (auto& pxl : row)
 						{
-							ofs << pxl.red << " " << pxl.green << " " << pxl.blue << "\n";
+							ofs << (int)pxl.red << " " << (int)pxl.green << " " << (int)pxl.blue << "\n";
 						}
 					}
 					return true;
