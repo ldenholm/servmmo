@@ -38,7 +38,7 @@ namespace smmo
 			}
 
 			// Set pixel
-			void SetXYToV(int32_t x, int32_t y, Pixel& v)
+			void SetXYToV(int32_t x, int32_t y, const Pixel& v)
 			{
 				pixels[y][x] = v;
 			}
@@ -116,6 +116,30 @@ namespace smmo
 
 		private:
 			
+		};
+
+		// Must be odd for now.
+		struct Kernel
+		{
+			uint8_t size;
+			vector<vector<float_t>> grid;
+
+			Kernel(uint8_t sz) : size(sz)
+			{
+				grid = vector<vector<float>>(size, vector<float>(size));
+				for (auto& row : grid)
+				{
+					for (auto& col : row)
+					{
+						col = (1 / size);
+					}
+				}
+			}
+
+			void MiddleIndex()
+			{
+				// todo: implement this.
+			}
 		};
 	}
 }
