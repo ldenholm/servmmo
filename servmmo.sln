@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Paths", "Paths\Paths.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PathTracer", "PathTracer\PathTracer.vcxproj", "{41F6CA1D-B748-45F0-9E7A-EBE84FCA4521}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Render", "Render\Render.vcxproj", "{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -77,6 +79,14 @@ Global
 		{41F6CA1D-B748-45F0-9E7A-EBE84FCA4521}.Release|x64.Build.0 = Release|x64
 		{41F6CA1D-B748-45F0-9E7A-EBE84FCA4521}.Release|x86.ActiveCfg = Release|Win32
 		{41F6CA1D-B748-45F0-9E7A-EBE84FCA4521}.Release|x86.Build.0 = Release|Win32
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Debug|x64.ActiveCfg = Debug|x64
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Debug|x64.Build.0 = Debug|x64
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Debug|x86.ActiveCfg = Debug|Win32
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Debug|x86.Build.0 = Debug|Win32
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Release|x64.ActiveCfg = Release|x64
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Release|x64.Build.0 = Release|x64
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Release|x86.ActiveCfg = Release|Win32
+		{2C6B94CF-D2CA-4021-84A6-E353AB2A4137}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
