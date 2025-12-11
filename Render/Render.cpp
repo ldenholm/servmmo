@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "Shader.h"
 
 using namespace std;
 
@@ -11,22 +12,17 @@ GLuint vao[numVAOs];
 
 GLuint createShaderProgram()
 {
-    const char* vShaderSrc =
-        "#version 430 \n"
-        "void main(void) \n"
-        "{ gl_Position = vec4(0.0, 0.0, 0.0, 1.0); }";
+    std::string vShdrStr = smmo::shader::io::readShaderSrc("vertexShader.glsl");
+    std::string fShdrStr = smmo::shader::io::readShaderSrc("fragShader.glsl");
 
-    const char* fShaderSrc =
-        "#version 430 \n"
-        "out vec4 color; \n"
-        "void main(void) \n"
-        "{ if (gl_FragCoord.x < 295) color = vec4(1.0, 0.0, 0.0, 1.0); else color = vec4(0.0, 0.0, 1.0, 1.0); }";
+    const char* vShdrSrc = vShdrStr.c_str();
+    const char* fShdrSrc = fShdrStr.c_str();
 
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-    glShaderSource(vShader, 1, &vShaderSrc, NULL);
-    glShaderSource(fShader, 1, &fShaderSrc, NULL);
+    glShaderSource(vShader, 1, &vShdrSrc, NULL);
+    glShaderSource(fShader, 1, &fShdrSrc, NULL);
     glCompileShader(vShader);
     glCompileShader(fShader);
 
