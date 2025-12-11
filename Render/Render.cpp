@@ -20,7 +20,7 @@ GLuint createShaderProgram()
         "#version 430 \n"
         "out vec4 color; \n"
         "void main(void) \n"
-        "{ color = vec4(0.0, 0.0, 1.0, 1.0); }";
+        "{ if (gl_FragCoord.x < 295) color = vec4(1.0, 0.0, 0.0, 1.0); else color = vec4(0.0, 0.0, 1.0, 1.0); }";
 
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -65,7 +65,7 @@ int main()
     if (!glfwInit()) { exit(EXIT_FAILURE); }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(400, 400, "c00l gfx d00d", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(600, 600, "c00l gfx d00d", NULL, NULL);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
     glfwSwapInterval(1);
