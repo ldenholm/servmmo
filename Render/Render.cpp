@@ -4,15 +4,56 @@
 
 using namespace std;
 
+#define numVAOs 1
+
+GLuint renderingProgram;
+GLuint vao[numVAOs];
+
+GLuint createShaderProgram()
+{
+    const char* vShaderSrc =
+        "#version 430 \n"
+        "void main(void) \n"
+        "{ gl_Position = vec4(0.0, 0.0, 0.0, 1.0); }";
+
+    const char* fShaderSrc =
+        "#version 430 \n"
+        "out vec4 color; \n"
+        "void main(void) \n"
+        "{ color = vec4(0.0, 0.0, 1.0, 1.0); }";
+
+    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    glShaderSource(vShader, 1, &vShaderSrc, NULL);
+    glShaderSource(fShader, 1, &fShaderSrc, NULL);
+    glCompileShader(vShader);
+    glCompileShader(fShader);
+
+    GLuint vfProgram = glCreateProgram();
+    glAttachShader(vfProgram, vShader);
+    glAttachShader(vfProgram, fShader);
+    glLinkProgram(vfProgram);
+
+    return vfProgram;
+
+}
+
+
 void init(GLFWwindow* window)
 {
-
+   renderingProgram = createShaderProgram();
+   glGenVertexArrays(numVAOs, vao);
+   glBindVertexArray(vao[0]);
 }
 
 void display(GLFWwindow* window, double currentTime)
 {
-    glClearColor(1.0, 0, 0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(renderingProgram);
+    glDrawArrays(GL_POINTS, 0, 1);
+    //glClearColor(1.0, 0, 0, 1.0);
+    //glClear(GL_COLOR_BUFFER_BIT);
+
 }
 
 int main()
