@@ -33,6 +33,8 @@ GLuint createShaderProgram()
     GLuint vfProgram = glCreateProgram();
     glAttachShader(vfProgram, vShader);
     glAttachShader(vfProgram, fShader);
+    // Link program actually creates executables for vertex and fragment
+    // shaders that will be executed on the GPU.
     glLinkProgram(vfProgram);
 
     return vfProgram;
@@ -49,7 +51,9 @@ void init(GLFWwindow* window)
 
 void display(GLFWwindow* window, double currentTime)
 {
+    // Install the shader executables on the GPU.
     glUseProgram(renderingProgram);
+    glPointSize(30.0f);
     glDrawArrays(GL_POINTS, 0, 1);
     //glClearColor(1.0, 0, 0, 1.0);
     //glClear(GL_COLOR_BUFFER_BIT);
