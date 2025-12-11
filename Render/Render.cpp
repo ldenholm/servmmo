@@ -50,7 +50,7 @@ void display(GLFWwindow* window, double currentTime)
     // Install the shader executables on the GPU.
     glUseProgram(renderingProgram);
     glPointSize(30.0f);
-    glDrawArrays(GL_POINTS, 0, 1);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     //glClearColor(1.0, 0, 0, 1.0);
     //glClear(GL_COLOR_BUFFER_BIT);
 
