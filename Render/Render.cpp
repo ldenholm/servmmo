@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "Error.h"
 
 using namespace std;
 
@@ -27,6 +28,9 @@ GLuint createShaderProgram()
     glShaderSource(fShader, 1, &fShdrSrc, NULL);
     glCompileShader(vShader);
     glCompileShader(fShader);
+    // Check errors
+    smmo::error::printShaderLog(vShader);
+    smmo::error::printShaderLog(fShader);
 
     GLuint vfProgram = glCreateProgram();
     glAttachShader(vfProgram, vShader);
@@ -34,6 +38,9 @@ GLuint createShaderProgram()
     // Link program actually creates executables for vertex and fragment
     // shaders that will be executed on the GPU.
     glLinkProgram(vfProgram);
+    
+    // Check errors
+    smmo::error::printProgramLog(vfProgram);
 
     return vfProgram;
 
