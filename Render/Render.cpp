@@ -7,11 +7,12 @@
 using namespace std;
 
 #define numVAOs 1
+#define numVBOs 2
 
 GLuint renderingProgram;
 GLuint vao[numVAOs];
-float x = 0.0f;
-float inc = 0.01f;
+GLuint vbo[numVBOs];
+
 
 GLuint createShaderProgram()
 {
@@ -52,6 +53,7 @@ void init(GLFWwindow* window)
    renderingProgram = createShaderProgram();
    glGenVertexArrays(numVAOs, vao);
    glBindVertexArray(vao[0]);
+   glGenBuffers(2, vbo);
 }
 
 void display(GLFWwindow* window, double currentTime)
@@ -63,9 +65,8 @@ void display(GLFWwindow* window, double currentTime)
     // Install the shader executables on the GPU.
     glUseProgram(renderingProgram);
 
-    x += inc;
-    if (x > 1.0f) inc = -0.01f;
-    if (x < -1.0f) inc = 0.01f;
+
+
     GLuint offset = glGetUniformLocation(renderingProgram, "offset");
     glProgramUniform1f(renderingProgram, offset, x);
 
