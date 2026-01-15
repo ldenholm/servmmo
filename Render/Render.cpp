@@ -1,76 +1,117 @@
+/*
+    This program explores model/view/perspective matrices in greater detail than my earlier work.
+    A quick sensical (to me) summary of these 3 transformations and what they really mean.
+    Model: we take our object (model) and place it in our world.
+    View: we place our camera in our world and apply this transformation so we view
+          our object according to our cameras position.
+    Perspective: we interpret our object through our camera lens further by applying human eye-like perspective.
+         Essentially applying depth perception and vanishing points so lines converge. This gives the 3d effect
+         to our 2d render.
+
+*/
+
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "Shader.h"
 #include "Error.h"
 
+
 using namespace std;
+
+// Globals
+// =======================================================
 
 #define numVAOs 1
 #define numVBOs 2
 
+float cameraX, cameraY, cameraZ;
+float cubePosX, cubePosY, cubePosZ;
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
+GLuint mvLoc, pLoc;
+int width, height;
+float aspect;
+glm::mat4 prjctnMat, vwMat, mdlMat, mvMat;
+// =======================================================
 
-GLuint createShaderProgram()
+void setupVertices()
 {
-    std::string vShdrStr = smmo::shader::io::readShaderSrc("vertexShader.glsl");
-    std::string fShdrStr = smmo::shader::io::readShaderSrc("fragShader.glsl");
-
-    const char* vShdrSrc = vShdrStr.c_str();
-    const char* fShdrSrc = fShdrStr.c_str();
-
-    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(vShader, 1, &vShdrSrc, NULL);
-    glShaderSource(fShader, 1, &fShdrSrc, NULL);
-    glCompileShader(vShader);
-    glCompileShader(fShader);
-    // Check errors
-    smmo::error::printShaderLog(vShader);
-    smmo::error::printShaderLog(fShader);
-
-    GLuint vfProgram = glCreateProgram();
-    glAttachShader(vfProgram, vShader);
-    glAttachShader(vfProgram, fShader);
-    // Link program actually creates executables for vertex and fragment
-    // shaders that will be executed on the GPU.
-    glLinkProgram(vfProgram);
+    // 36 vertices creates 12 triangles to build a cube at origin.
+    float vertexPositions[108] = {
+        -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
+        1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
+        1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f
+    };
     
-    // Check errors
-    smmo::error::printProgramLog(vfProgram);
-
-    return vfProgram;
-
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(vao[0]);
+    glGenBuffers(numVBOs, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
 }
-
 
 void init(GLFWwindow* window)
 {
-   renderingProgram = createShaderProgram();
-   glGenVertexArrays(numVAOs, vao);
-   glBindVertexArray(vao[0]);
-   glGenBuffers(2, vbo);
+   renderingProgram = smmo::shader::createShaderProgram("vertexShader.glsl", "fragShader.glsl");
+   cameraX = cameraY = 0.0f; cameraZ = 8.0f;
+   cubePosX = 0.0f; cubePosY = -2.0f; cubePosZ = 0.0f; // translate down Y to show perspective.
+   setupVertices();
+
+   // Construct any static matrices here.
 }
 
 void display(GLFWwindow* window, double currentTime)
 {
     glClear(GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0, 0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     // Install the shader executables on the GPU.
     glUseProgram(renderingProgram);
 
+    // Get unfirom vars location in shader prog.
+    mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
+    pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
+
+    // Build perspective matrix.
+    glfwGetFramebufferSize(window, &width, &height);
+    aspect = (float)width / (float)height;
+    prjctnMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs
+
+    // Build Model, View, View-Model matrices.
+    // View matrix transforms to the inverse camera position.
+    vwMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
+    mvMat = vwMat * mdlMat;
+
+    // Send model-view and perspective transforms to the uniform vars.
+
+
+
+    // Send transforms to uniform vars
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
 
     GLuint offset = glGetUniformLocation(renderingProgram, "offset");
     glProgramUniform1f(renderingProgram, offset, x);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // Construct any dynamic (frame-dependent) matrices here.
 
 }
 

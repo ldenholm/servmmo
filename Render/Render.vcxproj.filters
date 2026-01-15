@@ -18,6 +18,9 @@
     <ClCompile Include="Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h">
@@ -30,5 +33,13 @@
   <ItemGroup>
     <None Include="vertexShader.glsl" />
     <None Include="fragShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\Loki\Desktop\rasterization.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="C:\Users\Loki\Desktop\funny_sketch.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
