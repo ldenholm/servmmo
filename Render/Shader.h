@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string_view>
+#include "Error.h"
 
 namespace smmo
 {
@@ -11,7 +12,7 @@ namespace smmo
 	{
 		namespace io
 		{
-			std::string readShaderSrc(const char* path)
+			std::string readShaderSrc(std::string path)
 			{
 				std::string content;
 				std::ifstream fs(path);
@@ -27,11 +28,14 @@ namespace smmo
 			}
 		}
 
-        GLuint createShaderProgram(std::string_view vrtxShdrPth, std::string_view fragShdrPth)
+        GLuint createShaderProgram(std::string vtxShdrPth, std::string frgShdrPth)
         {
             
-            const char* vShdrSrc = vrtxShdrPth.c_str();
-            const char* fShdrSrc = fragShdrPth.c_str();
+            std::string vShdrStr = smmo::shader::io::readShaderSrc(vtxShdrPth);
+            std::string fShdrStr = smmo::shader::io::readShaderSrc(frgShdrPth);
+
+            const char* vShdrSrc = vShdrStr.c_str();
+            const char* fShdrSrc = fShdrStr.c_str();
 
             GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
             GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);

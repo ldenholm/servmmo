@@ -37,7 +37,7 @@ GLuint vbo[numVBOs];
 GLuint mvLoc, pLoc;
 int width, height;
 float aspect;
-glm::mat4 prjctnMat, vwMat, mdlMat, mvMat;
+glm::mat4 pMat, vwMat, mdlMat, mvMat;
 // =======================================================
 
 void setupVertices()
@@ -73,6 +73,13 @@ void init(GLFWwindow* window)
    setupVertices();
 
    // Construct any static matrices here.
+   
+   // Build perspective matrix.
+   glfwGetFramebufferSize(window, &width, &height);
+   aspect = (float)width / (float)height;
+   // Note the last 2 params for perspective are distance from viewer
+   // to near clipping plane (hence small value), and distance to far clipping plane.
+   pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs fov.
 }
 
 void display(GLFWwindow* window, double currentTime)
@@ -86,10 +93,9 @@ void display(GLFWwindow* window, double currentTime)
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
 
-    // Build perspective matrix.
-    glfwGetFramebufferSize(window, &width, &height);
-    aspect = (float)width / (float)height;
-    prjctnMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs
+    
+
+    // Construct any dynamic (frame-dependent) matrices here.
 
     // Build Model, View, View-Model matrices.
     // View matrix transforms to the inverse camera position.
@@ -98,20 +104,17 @@ void display(GLFWwindow* window, double currentTime)
     mvMat = vwMat * mdlMat;
 
     // Send model-view and perspective transforms to the uniform vars.
-
-
-
-    // Send transforms to uniform vars
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
-    GLuint offset = glGetUniformLocation(renderingProgram, "offset");
-    glProgramUniform1f(renderingProgram, offset, x);
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    // Construct any dynamic (frame-dependent) matrices here.
+    // Determine which objects are in front of others.
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
 }
 
@@ -120,7 +123,7 @@ int main()
     if (!glfwInit()) { exit(EXIT_FAILURE); }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(600, 600, "c00l gfx d00d", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(600, 600, "cutecube", NULL, NULL);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
     glfwSwapInterval(1);

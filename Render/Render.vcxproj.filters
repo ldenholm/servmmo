@@ -18,9 +18,6 @@
     <ClCompile Include="Render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Error.h">
@@ -39,6 +36,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="C:\Users\Loki\Desktop\funny_sketch.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="C:\Users\Loki\Desktop\cube_rendered.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
