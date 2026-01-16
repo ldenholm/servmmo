@@ -174,9 +174,9 @@
     <None Include="vertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\Loki\Desktop\cube_rendered.png" />
-    <Image Include="C:\Users\Loki\Desktop\funny_sketch.png" />
-    <Image Include="C:\Users\Loki\Desktop\rasterization.png" />
+    <Image Include="..\cube_rendered.png" />
+    <Image Include="..\funny_sketch.png" />
+    <Image Include="..\rasterization.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
