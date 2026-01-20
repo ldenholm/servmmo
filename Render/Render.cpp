@@ -37,7 +37,7 @@ GLuint vbo[numVBOs];
 GLuint mvLoc, pLoc;
 int width, height;
 float aspect;
-glm::mat4 pMat, vwMat, mdlMat, mvMat;
+glm::mat4 pMat, vwMat, mdlMat, mvMat, tMat, rMat;
 // =======================================================
 
 void setupVertices()
@@ -84,7 +84,7 @@ void init(GLFWwindow* window)
 
 void display(GLFWwindow* window, double currentTime)
 {
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Install the shader executables on the GPU.
     glUseProgram(renderingProgram);
@@ -100,22 +100,37 @@ void display(GLFWwindow* window, double currentTime)
     // Build Model, View, View-Model matrices.
     // View matrix transforms to the inverse camera position.
     vwMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
-    mvMat = vwMat * mdlMat;
+    //mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
 
-    // Send model-view and perspective transforms to the uniform vars.
-    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    // Render 24 cubes at varying z depths and rotations/translations.
+    float tf;
+    for (int i = 0; i < 24; i++)
+    {
+        tf = currentTime + i;
+        tMat = glm::translate(glm::mat4(1.0f), glm::vec3(sin(.35f*tf)*8.0f, 
+            cos(.52f * tf) * 8.0f, sin(.70f * tf) * 8.0f));
+        rMat = glm::rotate(glm::mat4(1.0f), 1.75f * tf, glm::vec3(0.0f, 1.0f, 0.0f));
+        rMat = glm::rotate(rMat, 1.75f * tf, glm::vec3(1.0f, 0.0f, 0.0f));
+        rMat = glm::rotate(rMat, 1.75f * tf, glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        mdlMat = tMat * rMat;
+        mvMat = vwMat * mdlMat;
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
+        // Send model-view and perspective transforms to the uniform vars.
+        glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+        glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
 
-    // Determine which objects are in front of others.
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        // Cfg how we seek (point) to vertex attributes.
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
 
+        // Determine which objects are in front of others.
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+    }
 }
 
 int main()
