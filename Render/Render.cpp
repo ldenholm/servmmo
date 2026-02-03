@@ -30,11 +30,12 @@ using namespace std;
 
 float cameraX, cameraY, cameraZ;
 float cubePosX, cubePosY, cubePosZ;
+float pyrPosX, pyrPosY, pyrPosZ;
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
-GLuint vLoc, pLoc, tfLoc;
+GLuint mvLoc, pLoc, tfLoc;
 int width, height;
 float aspect, timeFactor;
 glm::mat4 pMat, vMat, mdlMat, mvMat, tMat, rMat;
@@ -43,7 +44,7 @@ glm::mat4 pMat, vMat, mdlMat, mvMat, tMat, rMat;
 void setupVertices()
 {
     // 36 vertices creates 12 triangles to build a cube at origin.
-    float vertexPositions[108] = {
+    float cubePositions[108] = {
         -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
         1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
         1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
@@ -57,12 +58,26 @@ void setupVertices()
         -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
         1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f
     };
+
+    float pyramidPositions[54] =
+    { -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // front face
+    1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // right face
+    1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // back face
+    -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // left face
+    -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, // base – left front
+    1.0f, -1.0f, 1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f // base – right back
+    };
+
     
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[0]);
     glGenBuffers(numVBOs, vbo);
+    // cube
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubePositions), cubePositions, GL_STATIC_DRAW);
+    // pyramid
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(pyramidPositions), pyramidPositions, GL_STATIC_DRAW);
 }
 
 void init(GLFWwindow* window)
@@ -70,6 +85,7 @@ void init(GLFWwindow* window)
    renderingProgram = smmo::shader::createShaderProgram("vertexShader.glsl", "fragShader.glsl");
    cameraX = cameraY = 0.0f; cameraZ = 8.0f;
    cubePosX = 0.0f; cubePosY = -2.0f; cubePosZ = 0.0f; // translate down Y to show perspective.
+   pyrPosX = 1.0f; pyrPosY = 2.0f; pyrPosZ = 1.0f;
    setupVertices();
 
    // Construct any static matrices here.
@@ -90,37 +106,51 @@ void display(GLFWwindow* window, double currentTime)
     glUseProgram(renderingProgram);
 
     // Get unfirom vars location in shader prog.
-    vLoc = glGetUniformLocation(renderingProgram, "v_matrix");
+    mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
-
-    
 
     // Construct any dynamic (frame-dependent) matrices here.
 
     // Build Model, View, View-Model matrices.
     // View matrix transforms to the inverse camera position.
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    //mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
+    
+    // ======================================================================================
+    // drawing the cube:
+    mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
+    mvMat = vMat * mdlMat;
 
     // Render 24 cubes at varying z depths and rotations/translations.
 
-        // Send model-view and perspective transforms to the uniform vars.
-        glUniformMatrix4fv(vLoc, 1, GL_FALSE, glm::value_ptr(vMat));
-        glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    // Send model-view and perspective transforms to the uniform vars.
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    // Cfg how we seek (point) to vertex attributes.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
-        timeFactor = 0.2*((float)currentTime);
-        tfLoc = glGetUniformLocation(renderingProgram, "tf");
-        glUniform1f(tfLoc, (float)timeFactor);
+    // Determine which objects are in front of others.
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // ======================================================================================
+    // drawing the pyramid:
+    // ======================================================================================
+    // Reconstruct model matrix using desired pyrmid loc.
+    mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(pyrPosX, pyrPosY, pyrPosZ));
+    mvMat = vMat * mdlMat;
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-        // Cfg how we seek (point) to vertex attributes.
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
-
-        // Determine which objects are in front of others.
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 100000);
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    // bind buffer holding the pyramid vertex attributes
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 18);
+    // ======================================================================================
       
 }
 
