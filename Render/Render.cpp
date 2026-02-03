@@ -31,11 +31,12 @@ using namespace std;
 float cameraX, cameraY, cameraZ;
 float cubePosX, cubePosY, cubePosZ;
 float pyrPosX, pyrPosY, pyrPosZ;
+float rotationCounter;
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
-GLuint mvLoc, pLoc, tfLoc;
+GLuint mvLoc, pLoc, rotLoc;
 int width, height;
 float aspect, timeFactor;
 glm::mat4 pMat, vMat, mdlMat, mvMat, tMat, rMat;
@@ -86,6 +87,7 @@ void init(GLFWwindow* window)
    cameraX = cameraY = 0.0f; cameraZ = 8.0f;
    cubePosX = 0.0f; cubePosY = -2.0f; cubePosZ = 0.0f; // translate down Y to show perspective.
    pyrPosX = 1.0f; pyrPosY = 2.0f; pyrPosZ = 1.0f;
+   rotationCounter = 0.5f;
    setupVertices();
 
    // Construct any static matrices here.
@@ -108,6 +110,7 @@ void display(GLFWwindow* window, double currentTime)
     // Get unfirom vars location in shader prog.
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
+    rotLoc = glGetUniformLocation(renderingProgram, "rotationCounter");
 
     // Construct any dynamic (frame-dependent) matrices here.
 
@@ -125,6 +128,10 @@ void display(GLFWwindow* window, double currentTime)
     // Send model-view and perspective transforms to the uniform vars.
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    
+    if (rotationCounter < 1.0f) { rotationCounter += std::sin(currentTime); }
+    else { rotationCounter -= std::sin(currentTime); }
+    glUniform1f(rotLoc, rotationCounter);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     // Cfg how we seek (point) to vertex attributes.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
