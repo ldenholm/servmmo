@@ -1,3 +1,3 @@
-### Drawing multiple object in a single scene
-Includes a gradient in the fragment shader and animating rotation of objects along the y axis.
+### Drawing multiple objects in a single scene
+Created a gradient effect in the fragment shader and animation rotating objects along the y axis.
 ![cubepyr](resources/cubepyr.gif)
