@@ -10,6 +10,10 @@ implementing rotation and translation matrices, model view and projection
 matrices. This branch forms the basic programmatic structure for the rendering 
 engine I aim to expand.
 
+[Multiple Objects Single Scene](https://github.com/ldenholm/servmmo/tree/cube_pyramid)
+Using gradients in fragment shader. Drawing multiple objects in a single window.
+Experimenting with animation mostly rotation along a single axis.
+
 ### Adding acceleration with RMB and drag, only static collisions
 
 ![Velocity_Drag_](Balls/velocity_drag.gif)
