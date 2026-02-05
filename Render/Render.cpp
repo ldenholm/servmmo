@@ -84,7 +84,7 @@ void setupVertices()
 void init(GLFWwindow* window)
 {
    renderingProgram = smmo::shader::createShaderProgram("vertexShader.glsl", "fragShader.glsl");
-   cameraX = cameraY = 0.0f; cameraZ = 8.0f;
+   cameraX = cameraY = 0.0f; cameraZ = 14.0f;
    cubePosX = 0.0f; cubePosY = -2.0f; cubePosZ = 0.0f; // translate down Y to show perspective.
    pyrPosX = 1.0f; pyrPosY = 2.0f; pyrPosZ = 1.0f;
    setupVertices();
@@ -174,6 +174,15 @@ void display(GLFWwindow* window, double currentTime)
       
 }
 
+void registerEventHandlers(GLFWwindow* window)
+{
+    glfwSetScrollCallback(window, 
+        [](GLFWwindow* window, double xoffset, double yoffset)
+        {
+            if (yoffset > 0) { cameraZ += 1.0f; } else if (yoffset < 0) { cameraZ -= 1.0f;}
+        });
+}
+
 int main()
 {
     if (!glfwInit()) { exit(EXIT_FAILURE); }
@@ -183,6 +192,7 @@ int main()
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
     glfwSwapInterval(1);
+    registerEventHandlers(window);
     
     init(window);
 

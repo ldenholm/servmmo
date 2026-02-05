@@ -1,3 +1,3 @@
-### Drawing multiple object in a single scene
-Includes a gradient in the fragment shader and animating rotation of objects along the y axis.
-![cubepyr](resources/cubepyr.gif)
+### Drawing a miniature approximate solar system
+Implement mini solar system using cubes and pyramid. Added z-axis zooming.
+![pyrsystem](resources/pyr_system.gif)
