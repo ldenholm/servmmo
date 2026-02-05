@@ -14,6 +14,10 @@ engine I aim to expand.
 Using gradients in fragment shader. Drawing multiple objects in a single window.
 Experimenting with animation mostly rotation along a single axis.
 
+[Miniature Approximate Solar System](https://github.com/ldenholm/servmmo/tree/pyramid_system)
+Creating a mini solar system using the cubes and pyramid from earlier work. Includes
+z-axis zoom and matrix stacks for chaining matrix operations.
+
 ### Adding acceleration with RMB and drag, only static collisions
 
 ![Velocity_Drag_](Balls/velocity_drag.gif)
