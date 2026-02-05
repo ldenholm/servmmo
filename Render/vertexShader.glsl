@@ -3,16 +3,12 @@ layout (location=0) in vec3 position;
 
 uniform mat4 mv_matrix;
 uniform mat4 p_matrix;
-uniform float rotationCounter;
 
 out vec3 vColor;
 
-mat4 buildRotateY(float rad);
-
 void main(void)
 { 
-  mat4 localRotY = buildRotateY(rotationCounter);
-  gl_Position = p_matrix * mv_matrix * localRotY * vec4(position, 1.0);
+  gl_Position = p_matrix * mv_matrix * vec4(position, 1.0);
   vColor = position;
 }
 

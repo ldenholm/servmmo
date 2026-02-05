@@ -18,6 +18,7 @@
 #include <iostream>
 #include "Shader.h"
 #include "Error.h"
+#include <stack>
 
 
 using namespace std;
@@ -31,7 +32,6 @@ using namespace std;
 float cameraX, cameraY, cameraZ;
 float cubePosX, cubePosY, cubePosZ;
 float pyrPosX, pyrPosY, pyrPosZ;
-float rotationCounter;
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
@@ -87,7 +87,6 @@ void init(GLFWwindow* window)
    cameraX = cameraY = 0.0f; cameraZ = 8.0f;
    cubePosX = 0.0f; cubePosY = -2.0f; cubePosZ = 0.0f; // translate down Y to show perspective.
    pyrPosX = 1.0f; pyrPosY = 2.0f; pyrPosZ = 1.0f;
-   rotationCounter = 0.5f;
    setupVertices();
 
    // Construct any static matrices here.
@@ -100,6 +99,8 @@ void init(GLFWwindow* window)
    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs fov.
 }
 
+stack<glm::mat4> mvStack;
+
 void display(GLFWwindow* window, double currentTime)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -110,37 +111,48 @@ void display(GLFWwindow* window, double currentTime)
     // Get unfirom vars location in shader prog.
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
-    rotLoc = glGetUniformLocation(renderingProgram, "rotationCounter");
+    
 
     // Construct any dynamic (frame-dependent) matrices here.
 
     // Build Model, View, View-Model matrices.
     // View matrix transforms to the inverse camera position.
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    mvStack.push(vMat);
     
+    // Drawing the sun
     // ======================================================================================
-    // drawing the cube:
-    mdlMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePosX, cubePosY, cubePosZ));
-    mvMat = vMat * mdlMat;
+    mvStack.push(mvStack.top()); // push a duplicate matrix.
+    mvStack.top() *= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)); // position of our sun.
+    mvStack.push(mvStack.top()); // duplicate mv matrix of sun, we're gonna use it to build the x-rotation matrix.
+    mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(1.0f, 0.0f, 0.0f));
 
-    // Render 24 cubes at varying z depths and rotations/translations.
-
-    // Send model-view and perspective transforms to the uniform vars.
-    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
-    
-    if (rotationCounter < 1.0f) { rotationCounter += std::sin(currentTime); }
-    else { rotationCounter -= std::sin(currentTime); }
-    glUniform1f(rotLoc, rotationCounter);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    // Cfg how we seek (point) to vertex attributes.
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top()));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
-
-    // Determine which objects are in front of others.
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 18);
+    // ======================================================================================
+    mvStack.pop(); // remove the sun x axis rotation
+
+    // ======================================================================================
+    // drawing the cube:
+    mvStack.push(mvStack.top());
+    // cube (planet) orbiting the sun (pyramid):
+    mvStack.top() *= glm::translate(glm::mat4(1.0f), glm::vec3(sin((float)currentTime * 4.0), 0.0f, cos((float)currentTime) * 4));
+    mvStack.push(mvStack.top());
+    // cube (planet) rotating the sun (pyramid)
+    mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(0.0, 1.0, 0.0));
+    
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top()));
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    mvStack.pop();
     // ======================================================================================
     // drawing the pyramid:
     // ======================================================================================
@@ -152,11 +164,7 @@ void display(GLFWwindow* window, double currentTime)
     glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
     // bind buffer holding the pyramid vertex attributes
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDrawArrays(GL_TRIANGLES, 0, 18);
+
     // ======================================================================================
       
 }
