@@ -37,9 +37,9 @@ GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 
 GLuint mvLoc, pLoc, rotLoc;
-int width, height;
-float aspect, timeFactor;
-glm::mat4 pMat, vMat, mdlMat, mvMat, tMat, rMat;
+int g_width, g_height;
+float g_aspect, g_timeFactor;
+glm::mat4 g_pMat, g_vMat, g_mdlMat, g_mvMat, g_tMat, g_rMat;
 // =======================================================
 
 void setupVertices()
@@ -92,11 +92,11 @@ void init(GLFWwindow* window)
    // Construct any static matrices here.
    
    // Build perspective matrix.
-   glfwGetFramebufferSize(window, &width, &height);
-   aspect = (float)width / (float)height;
+   glfwGetFramebufferSize(window, &g_width, &g_height);
+   g_aspect = (float)g_width / (float)g_height;
    // Note the last 2 params for perspective are distance from viewer
    // to near clipping plane (hence small value), and distance to far clipping plane.
-   pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs fov.
+   g_pMat = glm::perspective(1.0472f, g_aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degs fov.
 }
 
 stack<glm::mat4> mvStack;
@@ -117,8 +117,8 @@ void display(GLFWwindow* window, double currentTime)
 
     // Build Model, View, View-Model matrices.
     // View matrix transforms to the inverse camera position.
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    mvStack.push(vMat);
+    g_vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    mvStack.push(g_vMat);
     
     // Drawing the sun
     // ======================================================================================
@@ -127,7 +127,7 @@ void display(GLFWwindow* window, double currentTime)
     mvStack.push(mvStack.top()); // duplicate mv matrix of sun, we're gonna use it to build the x-rotation matrix.
     mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(1.0f, 0.0f, 0.0f));
 
-    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(g_pMat));
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top()));
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -180,6 +180,13 @@ void registerEventHandlers(GLFWwindow* window)
         [](GLFWwindow* window, double xoffset, double yoffset)
         {
             if (yoffset > 0) { cameraZ += 1.0f; } else if (yoffset < 0) { cameraZ -= 1.0f;}
+        });
+
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
+        {
+            glViewport(0, 0, width, height);
+            g_aspect = (float)width / (float)height;
+            g_pMat = glm::perspective(1.0472f, g_aspect, 0.1f, 1000.0f);
         });
 }
 
