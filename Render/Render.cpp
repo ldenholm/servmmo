@@ -112,6 +112,8 @@ void display(GLFWwindow* window, double currentTime)
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     pLoc = glGetUniformLocation(renderingProgram, "p_matrix");
     
+    // Enable back face culling.
+    glEnable(GL_CULL_FACE);
 
     // Construct any dynamic (frame-dependent) matrices here.
 
@@ -134,6 +136,7 @@ void display(GLFWwindow* window, double currentTime)
     glEnableVertexAttribArray(0);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glFrontFace(GL_CCW);
     glDrawArrays(GL_TRIANGLES, 0, 18);
     // ======================================================================================
     mvStack.pop(); // remove the sun x axis rotation
@@ -151,6 +154,7 @@ void display(GLFWwindow* window, double currentTime)
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
+    glFrontFace(GL_CW);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     mvStack.pop();
     // ======================================================================================
