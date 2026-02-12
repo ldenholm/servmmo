@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="Error.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragShader.glsl" />
